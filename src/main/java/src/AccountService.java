@@ -3,14 +3,15 @@ package src;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 
 public class AccountService {
-    private Map<String, UserProfile> users = new HashMap<>();
+    private Map<String, UserProfile> users = new ConcurrentHashMap<>();
 
+    private static final String KEY = "login";
     private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
 
     public boolean addUser(String login, String email, String password){
@@ -22,7 +23,6 @@ public class AccountService {
         users.put(login,user);
         return true;
     }
-
     public boolean checkUser(String login){
         return users.containsKey(login);
     }
@@ -36,9 +36,8 @@ public class AccountService {
             user.setPassword(newPassword);
         }
     }
-
     public UserProfile getUser(HttpSession httpSession){
-        final String login = (String)httpSession.getAttribute("login");
+        final String login = (String)httpSession.getAttribute(KEY);
         return users.get(login);
     }
 }
