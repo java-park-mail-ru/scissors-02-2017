@@ -1,12 +1,12 @@
 package src;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 
 public class UserProfile {
-    private String login;
-    private String email;
+    private final String login;
+    private final String email;
     private String password;
-    private long id;
+    private final long id;
+
 
 
     public UserProfile(String login, String email, String password, long id) {
@@ -31,12 +31,6 @@ public class UserProfile {
 
     public void setPassword(String password){
          this.password = password;
-    }
-    public void setEmail(String email){
-        this.email = email;
-    }
-    public void setId(int id){
-        this.id = id;
     }
     public String getDataJson(){
         return "{\"login\" :" + '"' + login + "\", \"email\" :" + '"' + email + "\"}";

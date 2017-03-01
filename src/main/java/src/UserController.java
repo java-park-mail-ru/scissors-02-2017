@@ -7,12 +7,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
-@CrossOrigin()
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UserController {
     private AccountService accountService = new AccountService();
-
-    @RequestMapping(path = "/api/signup", method = RequestMethod.POST,  produces = "application/json", consumes = "application/json")
+    @RequestMapping(path = "/api", method = RequestMethod.POST)
+    public ResponseEntity<String> test(@RequestBody UserAuth body, HttpSession httpSession){
+        return ResponseEntity.status(HttpStatus.OK).body("");
+    }
+    @RequestMapping(path = "/api/signup", method = RequestMethod.POST,   consumes = "application/json")
     public ResponseEntity<String> registration(@RequestBody UserAuth body, HttpSession httpSession){
         final String login = body.getLogin();
         final String email = body.getEmail();
@@ -29,7 +32,7 @@ public class UserController {
         }
 
         if(accountService.addUser(login, email, password)){
-            accountService.addSession(httpSession, login);
+            httpSession.setAttribute("login", login);
             return ResponseEntity.status(HttpStatus.OK).body("{\"login\" : "+ '"' +login+"\"}");
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\" : "+ '"' +login+" is already exists\"}");
@@ -44,7 +47,7 @@ public class UserController {
         }
         if(accountService.checkUser(login)){
             if(accountService.getUser(login).getPassword().equals(password)){
-                accountService.addSession(httpSession, login);
+                httpSession.setAttribute("login", login);
                 return ResponseEntity.status(HttpStatus.OK).body("{\"login\" : "+ '"' +login+"\"}");
             }
         }
@@ -53,8 +56,8 @@ public class UserController {
 
     @RequestMapping(path="/api/session", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
     public ResponseEntity<String> logout(HttpSession httpSession) {
-        if(accountService.checkSession(httpSession)){
-            accountService.removeSession(httpSession);
+        if(httpSession.getAttribute("login")!=null){
+            httpSession.setAttribute("login", null);
             return ResponseEntity.status(HttpStatus.OK).body("{}");
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\" : \"session is not found\"}");
@@ -62,7 +65,7 @@ public class UserController {
 
     @RequestMapping(path="/api/session", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
     public ResponseEntity<String> userOfCurrentSession(HttpSession httpSession){
-        if(!accountService.checkSession(httpSession)){
+        if(httpSession.getAttribute("login")==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\" : \"session is not found\"}");
         }
         final UserProfile user = accountService.getUser(httpSession);
@@ -74,21 +77,21 @@ public class UserController {
         if(!accountService.checkUser(login)){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\" : \"user is not exists\"}");
         }
-        if(!accountService.checkSession(httpSession)){
+        if(httpSession.getAttribute("login")==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"error\" : \"user is not authorized\"}");
         }
         final UserProfile user = accountService.getUser(login);
         return ResponseEntity.status(HttpStatus.OK).body(user.getDataJson());
     }
     @RequestMapping(path="/api/user/{login}", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public ResponseEntity<String> changeUserData(@PathVariable(value = "login") String login, @RequestBody UserAuth body, HttpSession httpSession){
+    public ResponseEntity<String> changePassword(@PathVariable(value = "login") String login, @RequestBody UserAuth body, HttpSession httpSession){
         if(!accountService.checkUser(login)){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\" : \"user is not exists\"}");
         }
-        if(!accountService.checkSession(httpSession)){
+        if(httpSession.getAttribute("login")==null){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"error\" : \"user is not authorized\"}");
         }
-        accountService.changeUserData(login, body);
+        accountService.changePassword(login, body);
         return ResponseEntity.status(HttpStatus.OK).body("{}");
     }
 
