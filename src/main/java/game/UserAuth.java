@@ -1,16 +1,17 @@
 package game;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserAuth {
-    private String login;
-    private String email;
-    private String password;
+    private final String login;
+    private final String email;
+    private final String password;
 
     @JsonCreator
-    public UserAuth(@JsonProperty("login") String login, @JsonProperty("email") String email, @JsonProperty("password") String password){
+    public UserAuth(@JsonProperty("login") String login,
+                    @JsonProperty("email")  String email,
+                    @JsonProperty("password")  String password){
         this.login = login;
         this.email = email;
         this.password = password;
