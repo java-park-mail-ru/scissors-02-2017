@@ -26,7 +26,7 @@ public class UserController {
         final String password = body.getPassword();
 
         if (StringUtils.isEmpty(login)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error.EMPTY_LOGIN);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Error(Error.EMPTY_LOGIN));
         }
         if (StringUtils.isEmpty(password)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Error(Error.EMPTY_PASSWORD));
