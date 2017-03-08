@@ -99,7 +99,7 @@ public class UserController {
     @PostMapping(path = "/api/user/{login}")
     public ResponseEntity<?> changePassword(@PathVariable(value = "login") String login, @RequestBody UserAuth body, HttpSession httpSession) {
         final String attrib = (String) httpSession.getAttribute(KEY);
-        if (attrib == null || attrib != login) {
+        if (attrib == null || !attrib.equals(login)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseError.ERROR_AUTH);
         }
         accountService.changePassword(login, body);
