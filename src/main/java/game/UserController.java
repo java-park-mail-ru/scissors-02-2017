@@ -7,6 +7,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -104,6 +106,11 @@ public class UserController {
         }
         accountService.changePassword(login, body);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+    @GetMapping(path = "/api/rating")
+    public ResponseEntity<?> rating() {
+        final ArrayList<UserInfo> rating = accountService.getRating();
+        return ResponseEntity.status(HttpStatus.OK).body(rating);
     }
 
 }
