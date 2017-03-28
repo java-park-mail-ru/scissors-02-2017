@@ -42,8 +42,7 @@ public class AccountServiceTest {
     @Test
     public void getUser() {
         addUser();
-        final UserProfile expect = new UserProfile("test", "", "test");
-        expect.setScore(0);
+        final UserInfo expect = new UserInfo("test", 0);
         assertEquals(expect, service.getUser("test"));
     }
 
@@ -64,6 +63,27 @@ public class AccountServiceTest {
     @Test
     public void getRatingEmpty() {
         assertTrue(service.getRating().isEmpty());
+    }
+
+    @Test
+    public void authSuccess() {
+        addUser();
+        final UserProfile userAuth = new UserProfile("test", "", "test");
+        final UserInfo expect = new UserInfo("test", 0);
+        assertEquals(expect, service.auth(userAuth));
+    }
+
+    @Test
+    public void authNoUser() {
+        final UserProfile userAuth = new UserProfile("test", "", "test");
+        assertNull(service.auth(userAuth));
+    }
+
+    @Test
+    public void authWrongPassword(){
+        addUser();
+        final UserProfile userAuth = new UserProfile("test", "", "another");
+        assertNull(service.auth(userAuth));
     }
 
 

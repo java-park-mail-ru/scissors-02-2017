@@ -4,9 +4,12 @@ package game.services;
 import game.models.UserInfo;
 import game.models.UserProfile;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,8 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class AccountService {
@@ -33,8 +34,8 @@ public class AccountService {
         final String password = body.getPassword();
         try {
             return template.queryForObject(
-                    "insert into users (login, email, password) values(?,?,?) returning login,score",
-                    new Object[]{login, email, password},
+                    "INSERT INTO users (login, email, password) VALUES(?,?,?) RETURNING login,score",
+                    new Object[]{login, email, passwordEncoder().encode(password)},
                     AccountService::userInfo);
         } catch (DuplicateKeyException ex) {
             return null;
@@ -42,30 +43,47 @@ public class AccountService {
     }
 
     @Nullable
-    public UserProfile getUser(String login) {
+    public UserInfo getUser(String login) {
         try {
             return template.queryForObject(
-                    "select login,score,password from users where lower(login)=lower(?)",
+                    "SELECT login,score FROM users WHERE lower(login)=lower(?)",
                     new Object[]{login},
-                    AccountService::userAuth);
+                    AccountService::userInfo);
         } catch (DataAccessException ex) {
             return null;
         }
+    }
 
+    @Nullable
+    public UserInfo auth(UserProfile body) {
+        final String login = body.getLogin();
+        final String password = body.getPassword();
+        try {
+            final UserProfile user = template.queryForObject(
+                    "SELECT login,score,password FROM users WHERE lower(login)=lower(?)",
+                    new Object[]{login},
+                    AccountService::userAuth);
+            if (passwordEncoder().matches(password, user.getPassword())) {
+                return user.toInfo();
+            }
+            return null;
+        } catch (DataAccessException ex) {
+            return null;
+        }
     }
 
     public void changePassword(String login, UserProfile newData) {
         final String newPassword = newData.getPassword();
         if (!StringUtils.isEmpty(newPassword)) {
             template.update(
-                    "update users set password = ? where lower(login)=lower(?)",
+                    "UPDATE users SET password = ? WHERE lower(login)=lower(?)",
                     new Object[]{newPassword, login});
         }
     }
 
     public List<UserInfo> getRating() {
         try {
-            return template.query("select * from users order by score desc limit 10",
+            return template.query("SELECT * FROM users ORDER BY score DESC LIMIT 10",
                     AccountService::userInfo);
         } catch (DataAccessException ex) {
             return new ArrayList<UserInfo>();
@@ -87,8 +105,13 @@ public class AccountService {
         return user;
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     public void clear() {
-        template.update("truncate table users");
+        template.update("TRUNCATE TABLE users");
     }
 
 

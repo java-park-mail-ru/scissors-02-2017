@@ -60,15 +60,12 @@ public class UserController {
         if (StringUtils.isEmpty(password)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.EMPTY_PASSWORD);
         }
-        final UserProfile user = accountService.getUser(login);
+        final UserInfo user = accountService.auth(body);
         if (user != null) {
-            if (user.getPassword().equals(password)) {
-                httpSession.setAttribute(KEY, login);
-                return ResponseEntity.status(HttpStatus.OK).body(user.toInfo());
-            }
+            return ResponseEntity.status(HttpStatus.OK).body(user);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.ERROR_SIGNUP);
-    }
+}
 
     @DeleteMapping(path = "/api/session")
     public ResponseEntity<?> logout(HttpSession httpSession) {
@@ -86,8 +83,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.ERROR_AUTH);
         }
         final String login = (String) httpSession.getAttribute(KEY);
-        final UserProfile user = accountService.getUser(login);
-        return ResponseEntity.status(HttpStatus.OK).body(user.toInfo());
+        final UserInfo user = accountService.getUser(login);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @GetMapping(path = "/api/user/{login}")
@@ -95,11 +92,11 @@ public class UserController {
         if (httpSession.getAttribute(KEY) == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseError.ERROR_AUTH);
         }
-        final UserProfile user = accountService.getUser(login);
+        final UserInfo user = accountService.getUser(login);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseError.ERROR_USER);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(user.toInfo());
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PostMapping(path = "/api/user/{login}")
@@ -109,6 +106,7 @@ public class UserController {
         if (attrib == null || !attrib.equals(login)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseError.ERROR_AUTH);
         }
+        accountService.changePassword(login,body);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
