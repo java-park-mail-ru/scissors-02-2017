@@ -76,7 +76,7 @@ public class AccountService {
 
     public List<UserInfo> getRating() {
         try {
-            return template.query("select * from users order by score desc limit 10",
+            return template.query("select * from users order by score desc,id asc limit 10",
                     AccountService::userInfo);
         } catch (DataAccessException ex) {
             return new ArrayList<UserInfo>();
