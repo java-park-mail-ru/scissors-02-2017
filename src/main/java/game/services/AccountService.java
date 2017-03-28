@@ -1,7 +1,6 @@
 package game.services;
 
 
-import game.models.UserAuth;
 import game.models.UserInfo;
 import game.models.UserProfile;
 import org.jetbrains.annotations.Nullable;
@@ -26,10 +25,6 @@ public class AccountService {
     public AccountService(JdbcTemplate tem) {
         this.template = tem;
     }
-
-    private ConcurrentHashMap<String, UserProfile> users = new ConcurrentHashMap<>();
-    private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
-
 
     @Nullable
     public UserInfo addUser(UserProfile body) {
@@ -59,35 +54,31 @@ public class AccountService {
 
     }
 
-    public boolean changePassword(String login, UserAuth newData) {
+    public void changePassword(String login, UserProfile newData) {
         final String newPassword = newData.getPassword();
         if (!StringUtils.isEmpty(newPassword)) {
-            try {
-                template.update(
-                        "update users set password = ? where lower(login)=lower(?)",
-                        new Object[]{newPassword, login});
-                return true;
-            } catch (DataAccessException ex) {
-                return false;
-            }
+            template.update(
+                    "update users set password = ? where lower(login)=lower(?)",
+                    new Object[]{newPassword, login});
         }
-        return false;
     }
 
     public List<UserInfo> getRating() {
         try {
-            return template.query("select * from users order by score desc,id asc limit 10",
+            return template.query("select * from users order by score desc limit 10",
                     AccountService::userInfo);
         } catch (DataAccessException ex) {
             return new ArrayList<UserInfo>();
         }
     }
+
     public static UserInfo userInfo(ResultSet rs, int rowNum) throws SQLException {
         final UserInfo user = new UserInfo();
         user.setLogin(rs.getString("login"));
         user.setScore(rs.getInt("score"));
         return user;
     }
+
     public static UserProfile userAuth(ResultSet rs, int rowNum) throws SQLException {
         final UserProfile user = new UserProfile();
         user.setLogin(rs.getString("login"));
@@ -95,7 +86,8 @@ public class AccountService {
         user.setPassword(rs.getString("password"));
         return user;
     }
-    public void clear(){
+
+    public void clear() {
         template.update("truncate table users");
     }
 

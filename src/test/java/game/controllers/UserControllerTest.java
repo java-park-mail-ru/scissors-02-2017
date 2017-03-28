@@ -119,6 +119,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("login").value("test"))
                 .andExpect(jsonPath("score").value("0"));
     }
+
     @Test
     public void userOfCurrentSession400() throws Exception {
         mockMvc
@@ -126,6 +127,7 @@ public class UserControllerTest {
                         get("/api/session"))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     public void getUser200() throws Exception {
         signup200();
@@ -137,6 +139,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("score").value("0"))
                 .andExpect(status().isOk());
     }
+
     @Test
     public void getUser403() throws Exception {
         signup200();
@@ -146,10 +149,11 @@ public class UserControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("error").value("user is not auth"));
     }
+
     @Test
     public void changePassword200() throws Exception {
         signup200();
-        UserProfile user = new UserProfile("","","test1");
+        final UserProfile user = new UserProfile("", "", "test1");
         mockMvc
                 .perform(
                         post("/api/user/test")
@@ -158,10 +162,11 @@ public class UserControllerTest {
                                 .content(asJsonString(user)))
                 .andExpect(status().isOk());
     }
+
     @Test
     public void changePassword403_noSession() throws Exception {
         signup200();
-        UserProfile user = new UserProfile("","","test1");
+        final UserProfile user = new UserProfile("", "", "test1");
         mockMvc
                 .perform(
                         post("/api/user/test")
@@ -169,26 +174,29 @@ public class UserControllerTest {
                                 .content(asJsonString(user)))
                 .andExpect(status().isForbidden());
     }
+
     @Test
     public void changePassword403() throws Exception {
         signup200();
-        UserProfile user = new UserProfile("","","test1");
+        final UserProfile user = new UserProfile("", "", "test1");
         mockMvc
                 .perform(
                         post("/api/user/test")
-                                .sessionAttr(KEY,"another")
+                                .sessionAttr(KEY, "another")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(user)))
                 .andExpect(status().isForbidden());
     }
+
     @Test
     public void rating_empty() throws Exception {
         mockMvc
                 .perform(
                         get("/api/rating"))
                 .andExpect(status().isOk())
-        .andExpect(content().json("[]"));
+                .andExpect(content().json("[]"));
     }
+
     @Test
     public void rating() throws Exception {
         final UserProfile user1 = new UserProfile("test1", "test1", "test");
@@ -213,6 +221,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].score").value("0"))
                 .andExpect(jsonPath("$[1].score").value("0"));
     }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);

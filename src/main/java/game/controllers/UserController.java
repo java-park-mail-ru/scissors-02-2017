@@ -1,8 +1,7 @@
 package game.controllers;
 
 
-import game.models.ResponseError;
-import game.models.UserAuth;
+import game.response.ResponseError;
 import game.models.UserInfo;
 import game.models.UserProfile;
 import game.services.AccountService;
@@ -12,7 +11,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-
 
 
 @CrossOrigin
@@ -53,7 +51,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/api/session")
-    public ResponseEntity<?> login(@RequestBody UserAuth body, HttpSession httpSession) {
+    public ResponseEntity<?> login(@RequestBody UserProfile body, HttpSession httpSession) {
         final String login = body.getLogin();
         final String password = body.getPassword();
         if (StringUtils.isEmpty(login)) {
@@ -106,19 +104,14 @@ public class UserController {
 
     @PostMapping(path = "/api/user/{login}")
     public ResponseEntity<?> changePassword(@PathVariable(value = "login") String login,
-                                            @RequestBody UserAuth body, HttpSession httpSession) {
+                                            @RequestBody UserProfile body, HttpSession httpSession) {
         final String attrib = (String) httpSession.getAttribute(KEY);
         if (attrib == null || !attrib.equals(login)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseError.ERROR_AUTH);
         }
-        if(accountService.changePassword(login, body)){
-            return ResponseEntity.status(HttpStatus.OK).body(null);
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseError.ERROR_AUTH);
-        }
-
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
     @GetMapping(path = "/api/rating")
     public ResponseEntity<?> rating() {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.getRating());

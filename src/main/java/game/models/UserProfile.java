@@ -7,7 +7,6 @@ public class UserProfile {
     private String login;
     private String email;
     private String password;
-    private long id;
     private long score;
 
     public UserProfile() {
@@ -34,11 +33,7 @@ public class UserProfile {
         return this.login;
     }
 
-    public long getId() {
-        return this.id;
-    }
-
-    public long getScore() {
+   public long getScore() {
         return this.score;
     }
 
@@ -48,10 +43,6 @@ public class UserProfile {
 
     public void setLogin(String login) {
         this.login = login;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public void setPassword(String password) {
@@ -64,6 +55,24 @@ public class UserProfile {
 
     public UserInfo toInfo() {
         return new UserInfo(login, score);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final UserProfile other = (UserProfile) obj;
+        if (!login.equals(other.getLogin()))
+            return false;
+        if (score != other.getScore())
+            return false;
+        if(password!=null&&!password.equals(other.getPassword()))
+            return false;
+        return true;
     }
 
 }

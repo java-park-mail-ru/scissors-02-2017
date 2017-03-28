@@ -1,4 +1,4 @@
-package game.models;
+package game.response;
 
 public class ResponseError {
     public static final ResponseError EMPTY_LOGIN = new ResponseError("login is empty");

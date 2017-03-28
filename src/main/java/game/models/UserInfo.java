@@ -27,4 +27,20 @@ public class UserInfo {
     public void setLogin(String login) {
         this.login = login;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final UserInfo other = (UserInfo) obj;
+        if (!login.equals(other.getLogin()))
+            return false;
+        if (score != other.getScore())
+            return false;
+        return true;
+    }
 }
