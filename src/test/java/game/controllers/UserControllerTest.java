@@ -1,8 +1,5 @@
 package game.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import game.models.UserInfo;
-import game.models.UserProfile;
 import game.services.AccountService;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
+
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 public class UserControllerTest {
     private static final String KEY = "login";
@@ -34,6 +32,10 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private String bodySignUp = "{\"login\":\"test\", \"email\":\"test\", \"password\":\"test\"}";
+    private String bodyLogin = "{\"login\":\"test\",  \"password\":\"test\"}";
+    private String password = "{\"password\":\"test1\"}";
+
     @Before
     public void start() {
         accountService.clear();
@@ -41,12 +43,12 @@ public class UserControllerTest {
 
     @Test
     public void signup200() throws Exception {
-        final UserProfile user = new UserProfile("test", "test", "test");
+
         mockMvc
                 .perform(
                         post("/api/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(bodySignUp))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("login").value("test"))
                 .andExpect(jsonPath("score").value("0"));
@@ -55,12 +57,11 @@ public class UserControllerTest {
     @Test
     public void signup400() throws Exception {
         signup200();
-        final UserProfile user = new UserProfile("test", "test", "test");
         mockMvc
                 .perform(
                         post("/api/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(bodySignUp))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("error").value("login is already exists"));
     }
@@ -87,24 +88,23 @@ public class UserControllerTest {
     @Test
     public void login200() throws Exception {
         signup200();
-        final UserProfile user = new UserProfile("test", "", "test");
         mockMvc
                 .perform(
                         post("/api/session")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(bodyLogin))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("login").value("test"));
+                .andExpect(jsonPath("login").value("test"))
+                .andExpect(jsonPath("score").value("0"));
     }
 
     @Test
     public void login400() throws Exception {
-        final UserProfile user = new UserProfile("test", "", "test");
         mockMvc
                 .perform(
                         post("/api/session")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(bodyLogin))
                 .andExpect(status().isBadRequest());
     }
 
@@ -153,38 +153,36 @@ public class UserControllerTest {
     @Test
     public void changePassword200() throws Exception {
         signup200();
-        final UserProfile user = new UserProfile("", "", "test1");
+
         mockMvc
                 .perform(
                         post("/api/user/test")
                                 .sessionAttr(KEY, "test")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(password))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void changePassword403_noSession() throws Exception {
         signup200();
-        final UserProfile user = new UserProfile("", "", "test1");
         mockMvc
                 .perform(
                         post("/api/user/test")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(password))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void changePassword403() throws Exception {
         signup200();
-        final UserProfile user = new UserProfile("", "", "test1");
         mockMvc
                 .perform(
                         post("/api/user/test")
                                 .sessionAttr(KEY, "another")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user)))
+                                .content(password))
                 .andExpect(status().isForbidden());
     }
 
@@ -199,34 +197,26 @@ public class UserControllerTest {
 
     @Test
     public void rating() throws Exception {
-        final UserProfile user1 = new UserProfile("test1", "test1", "test");
-        final UserProfile user2 = new UserProfile("test2", "test2", "test");
         mockMvc
                 .perform(
                         post("/api/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user1)));
+                                .content(bodySignUp));
+        final String bodySignUp2 = "{\"login\":\"test2\", \"email\":\"test2\", \"password\":\"test2\"}";
         mockMvc
                 .perform(
                         post("/api/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJsonString(user2)));
+                                .content(bodySignUp2));
         mockMvc
                 .perform(
                         get("/api/rating"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].login").value("test1"))
+                .andExpect(jsonPath("$[0].login").value("test"))
                 .andExpect(jsonPath("$[1].login").value("test2"))
                 .andExpect(jsonPath("$[0].score").value("0"))
                 .andExpect(jsonPath("$[1].score").value("0"));
     }
 
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

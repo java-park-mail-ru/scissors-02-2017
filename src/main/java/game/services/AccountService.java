@@ -1,14 +1,14 @@
 package game.services;
 
 
+
 import game.models.UserInfo;
 import game.models.UserProfile;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,6 +20,8 @@ import java.util.List;
 
 @Service
 public class AccountService {
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     private final JdbcTemplate template;
 
@@ -28,15 +30,14 @@ public class AccountService {
     }
 
     @Nullable
-    public UserInfo addUser(UserProfile body) {
+   public UserInfo addUser(UserProfile body) {
         final String login = body.getLogin();
         final String email = body.getEmail();
         final String password = body.getPassword();
         try {
             return template.queryForObject(
                     "INSERT INTO users (login, email, password) VALUES(?,?,?) RETURNING login,score",
-                    new Object[]{login, email, passwordEncoder().encode(password)},
-                    AccountService::userInfo);
+                    AccountService::userInfo, login, email, passwordEncoder.encode(password));
         } catch (DuplicateKeyException ex) {
             return null;
         }
@@ -47,8 +48,7 @@ public class AccountService {
         try {
             return template.queryForObject(
                     "SELECT login,score FROM users WHERE lower(login)=lower(?)",
-                    new Object[]{login},
-                    AccountService::userInfo);
+                    AccountService::userInfo, login);
         } catch (DataAccessException ex) {
             return null;
         }
@@ -61,9 +61,8 @@ public class AccountService {
         try {
             final UserProfile user = template.queryForObject(
                     "SELECT login,score,password FROM users WHERE lower(login)=lower(?)",
-                    new Object[]{login},
-                    AccountService::userAuth);
-            if (passwordEncoder().matches(password, user.getPassword())) {
+                    AccountService::userAuth,login);
+            if ( passwordEncoder.matches(password, user.getPassword())) {
                 return user.toInfo();
             }
             return null;
@@ -77,7 +76,7 @@ public class AccountService {
         if (!StringUtils.isEmpty(newPassword)) {
             template.update(
                     "UPDATE users SET password = ? WHERE lower(login)=lower(?)",
-                    new Object[]{newPassword, login});
+                    newPassword, login);
         }
     }
 
@@ -105,10 +104,6 @@ public class AccountService {
         return user;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     public void clear() {
         template.update("TRUNCATE TABLE users");
