@@ -5,5 +5,6 @@ services:
   - postgresql
 before_script:
   - psql -c "create user rws with password 'rws';" -U postgres
-  - psql -c 'create database testing;' -U postgres
+  - psql -c "create database testing;" -U postgres
+  - psql -c "CREATE EXTENSION IF NOT EXISTS CITEXT;" -U postgres
   - psql -c "grant all on database testing to rws;" -U postgres
