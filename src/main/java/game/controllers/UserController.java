@@ -71,6 +71,7 @@ public class UserController {
 
         if (user != null) {
             LOG.info("user {} login", login);
+            httpSession.setAttribute(KEY,login);
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
         LOG.info("user {} tried to login. Incorrect login/password", login);
