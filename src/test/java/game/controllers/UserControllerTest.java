@@ -18,11 +18,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+/* TODO : проверять сессии*/
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 public class UserControllerTest {
     private static final String KEY = "login";

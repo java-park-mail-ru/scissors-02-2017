@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 
-@CrossOrigin
+@CrossOrigin(maxAge = 84600)
 @RestController
-public class UserController {
+public class  UserController {
 
     private final AccountService accountService;
     private static final String KEY = "login";
