@@ -6,6 +6,7 @@ import game.services.AccountService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -25,30 +26,33 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public GameSocketHandler(@NotNull AccountService accountService, @NotNull GameMessageHandlerContainer gameMessageHandlerContainer){
-        this.accountService=accountService;
-        this.gameMessageHandlerContainer=gameMessageHandlerContainer;
+
+    public GameSocketHandler(@NotNull AccountService accountService, @NotNull GameMessageHandlerContainer gameMessageHandlerContainer) {
+        this.accountService = accountService;
+        this.gameMessageHandlerContainer = gameMessageHandlerContainer;
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession webSocketSession){
+    public void afterConnectionEstablished(WebSocketSession webSocketSession) {
         LOGGER.info("connect");
 
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws AuthenticationException {
+    /*protected void handleTextMessage(WebSocketSession session, TextMessage message) throws AuthenticationException {
         final String login =  (String)session.getAttributes().get(KEY);
         final UserInfo user = accountService.getUser(login);
         if (login == null || user== null) {
             throw new AuthenticationException("Only authenticated users allowed to play a game");
         }
         handleMessage(user, message);
+    }*/
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        final UserInfo user = new UserInfo("name", 0);
+        handleMessage(user, message);
     }
 
-
     private void handleMessage(UserInfo user, TextMessage text) {
-
         final Message message;
         try {
             message = objectMapper.readValue(text.getPayload(), Message.class);
@@ -70,7 +74,7 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
-         }
+    }
 
     @Override
     public boolean supportsPartialMessages() {

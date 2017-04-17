@@ -1,6 +1,7 @@
 package game.mechanic;
 
 
+import game.models.ClientSnap;
 import game.models.UserInfo;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -13,23 +14,27 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
 public class GameMechanic {
-    @NotNull
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameMechanic.class);
-    @NotNull
-    private Set<UserInfo> playingUsers = new HashSet<>();
+    private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(GameMechanic.class);
 
-    @NotNull
-    private ConcurrentLinkedQueue<UserInfo> waiters = new ConcurrentLinkedQueue<>();
+    private @NotNull Set<UserInfo> playingUsers = new HashSet<>();
 
-    public void addPlayer(UserInfo user){
-        if(playingUsers.contains(user)){
+    private @NotNull ConcurrentLinkedQueue<UserInfo> waiters = new ConcurrentLinkedQueue<>();
+
+    public void addSnap(ClientSnap clientSnap) {
+
+    }
+
+    public void addPlayer(UserInfo user) {
+        if (playingUsers.contains(user)) {
             return;
         }
         LOGGER.info("add waiter {}", user);
         waiters.add(user);
     }
-    public void gameStep(){
+
+    public void gameStep() {
         LOGGER.info("step game");
+
 
     }
 

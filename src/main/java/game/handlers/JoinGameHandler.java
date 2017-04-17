@@ -3,6 +3,7 @@ package game.handlers;
 import game.mechanic.GameMechanic;
 import game.models.UserInfo;
 import game.websocket.GameMessageHandlerContainer;
+import game.websocket.Message;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class JoinGameHandler extends MessageHandler {
     }
 
     @Override
-    public void handle(@NotNull String message, @NotNull UserInfo forUser) {
-        gameMechanics.addPlayer(forUser);
+    public void handle(@NotNull Message message, @NotNull UserInfo user) {
+        gameMechanics.addPlayer(user);
     }
 }

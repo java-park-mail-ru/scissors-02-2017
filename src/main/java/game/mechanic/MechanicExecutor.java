@@ -15,8 +15,7 @@ public class MechanicExecutor implements Runnable{
     private static final Logger LOGGER = LoggerFactory.getLogger(MechanicExecutor.class);
     private static final long STEP_TIME = 50;
 
-    @NotNull
-    private final GameMechanic gameMechanic;
+    private final @NotNull GameMechanic gameMechanic;
 
     private Executor tickExecutor = Executors.newSingleThreadExecutor();
 

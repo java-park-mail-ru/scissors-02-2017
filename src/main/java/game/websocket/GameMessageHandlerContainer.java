@@ -26,7 +26,7 @@ public class  GameMessageHandlerContainer {
             LOGGER.warn("no handler for message of {} type", message.getType());
             return;
         }
-        messageHandler.handle(message.getContent(), forUser);
+        messageHandler.handle(message, forUser);
         LOGGER.debug("message handled: type =[" + message.getType() + "], content=[" + message.getContent() + ']');
     }
 
