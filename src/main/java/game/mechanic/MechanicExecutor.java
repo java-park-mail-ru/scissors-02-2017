@@ -12,8 +12,7 @@ import java.util.concurrent.Executors;
 
 @Service
 public class MechanicExecutor implements Runnable{
-    private static final Logger LOGGER = LoggerFactory.getLogger(MechanicExecutor.class);
-    private static final long STEP_TIME = 50;
+    private static final long STEP_TIME = 1000;
 
     private final @NotNull GameMechanic gameMechanic;
 
@@ -26,7 +25,6 @@ public class MechanicExecutor implements Runnable{
 
     @PostConstruct
     public void initAfterStartup() {
-        LOGGER.info("start");
         tickExecutor.execute(this);
     }
 
@@ -34,11 +32,10 @@ public class MechanicExecutor implements Runnable{
     public void run() {
         while(true){
             gameMechanic.gameStep();
-
             try {
                 Thread.sleep(STEP_TIME);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                return;
             }
             if (Thread.currentThread().isInterrupted()) {
                 return;

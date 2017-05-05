@@ -1,7 +1,7 @@
 package game.config;
 
 
-import game.websocket.GameSocketHandler;
+import game.transport.websocket.GameSocketHandler;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.springframework.context.annotation.Bean;
@@ -46,5 +46,4 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public WebSocketHandler gameWebSocketHandler() {
         return new PerConnectionWebSocketHandler(GameSocketHandler.class);
     }
-
 }

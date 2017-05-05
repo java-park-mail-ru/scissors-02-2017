@@ -1,4 +1,4 @@
-package game.models;
+package game.users;
 
 public class UserInfo {
     private String login;

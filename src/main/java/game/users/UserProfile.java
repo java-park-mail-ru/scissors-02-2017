@@ -1,4 +1,4 @@
-package game.models;
+package game.users;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

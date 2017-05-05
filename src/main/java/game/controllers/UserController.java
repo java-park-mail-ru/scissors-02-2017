@@ -2,8 +2,8 @@ package game.controllers;
 
 
 import game.response.ResponseError;
-import game.models.UserInfo;
-import game.models.UserProfile;
+import game.users.UserInfo;
+import game.users.UserProfile;
 import game.services.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
