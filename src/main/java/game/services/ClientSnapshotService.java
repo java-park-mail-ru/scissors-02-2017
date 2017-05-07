@@ -30,5 +30,9 @@ public class ClientSnapshotService {
             return snaps.get(snaps.size() - 1);
     }
 
+    public void clear(){
+        clientSnaps.clear();
+    }
+
 
 }

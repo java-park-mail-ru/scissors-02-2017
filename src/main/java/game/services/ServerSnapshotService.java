@@ -3,7 +3,9 @@ package game.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import game.mechanic.GameSession;
+import game.objects.Bullet;
 import game.objects.Player;
+import game.snapshots.ServerSnap;
 import game.transport.websocket.Message;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -21,8 +23,14 @@ public class ServerSnapshotService {
         final Message message = new Message();
         message.setType("ServerSnap");
         final Set<Player> players = gameSession.getPlayers();
+        final Set<Bullet> bullets = gameSession.getBullets();
+
+        final ServerSnap serverSnap = new ServerSnap();
+        serverSnap.setBullets(bullets);
+        serverSnap.setPlayers(players);
+
         try {
-            message.setContent(objectMapper.writeValueAsString(players));
+            message.setContent(objectMapper.writeValueAsString(serverSnap));
         } catch (JsonProcessingException e) {
             LOGGER.error("json format error: ", e);
         }
@@ -39,6 +47,5 @@ public class ServerSnapshotService {
             LOGGER.error("json format error: ", e);
         }
         return message;
-
     }
 }

@@ -1,13 +1,17 @@
 package game.objects;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Bullet extends GameObject {
     private static final AtomicLong ATOMIC_ID = new AtomicLong(0);
     private long id;
     private String type;
+    @JsonIgnore
     private short damage;
+    @JsonIgnore
     private short speed;
 
     public Bullet() {

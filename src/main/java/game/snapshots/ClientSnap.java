@@ -46,7 +46,7 @@ public class ClientSnap {
         return isFiring;
     }
 
-    public void setFiring(boolean firing) {
+    public void setIsFiring(boolean firing) {
         isFiring = firing;
     }
 

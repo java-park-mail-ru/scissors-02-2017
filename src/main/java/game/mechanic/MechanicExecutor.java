@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 @Service
 public class MechanicExecutor implements Runnable{
-    private static final long STEP_TIME = 1000;
+    private static final long STEP_TIME = 10000;
 
     private final @NotNull GameMechanic gameMechanic;
 

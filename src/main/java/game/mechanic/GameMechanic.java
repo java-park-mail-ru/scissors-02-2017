@@ -1,6 +1,7 @@
 package game.mechanic;
 
 
+import game.resourses.ResourseFactory;
 import game.snapshots.ClientSnap;
 import game.objects.Player;
 import game.services.ClientSnapshotService;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +25,10 @@ public class GameMechanic {
     private @NotNull ClientSnapshotService clientSnapshotService;
     private @NotNull RemotePointService remotePointService;
     private @NotNull GameService gameService;
+    private @NotNull ResourseFactory resourseFactory;
+
+    private  int NUMBER_PLAYERS;
+    private  long GAME_TIME;
 
     private @NotNull Set<Player> players = new HashSet<>();
 
@@ -32,10 +38,18 @@ public class GameMechanic {
 
     public GameMechanic(@NotNull ClientSnapshotService clientSnapshotService,
                         @NotNull RemotePointService remotePointService,
-                        @NotNull GameService gameService) {
+                        @NotNull GameService gameService,
+                        @NotNull ResourseFactory resourseFactory) {
         this.clientSnapshotService = clientSnapshotService;
         this.remotePointService = remotePointService;
         this.gameService = gameService;
+        this.resourseFactory = resourseFactory;
+    }
+    @PostConstruct
+    private void setup(){
+        final Deathmatch setting = resourseFactory.get("game/deathmatch.json", Deathmatch.class);
+        NUMBER_PLAYERS = setting.getPlayers();
+        GAME_TIME = setting.getGameTime();
     }
 
     public void addSnap(String user, ClientSnap clientSnap) {
@@ -72,7 +86,7 @@ public class GameMechanic {
 
         gameService.createAndSendMessages();
 
-        gameService.stopGameSessions();
+        gameService.stopGameSessions(GAME_TIME);
 
     }
 

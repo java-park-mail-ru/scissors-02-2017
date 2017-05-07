@@ -6,8 +6,6 @@ import game.objects.Bullet;
 import java.util.*;
 
 public class GameSession {
-    //нужно наверное вынести отсюда
-    private static final long GAME_TIME = 180000;
 
     private long time = System.currentTimeMillis();
 
@@ -29,13 +27,23 @@ public class GameSession {
         return players;
     }
 
-    public boolean isGameOver() {
-        return System.currentTimeMillis() - time > GAME_TIME;
+    public boolean isGameOver(long gameTime) {
+        return System.currentTimeMillis() - time > gameTime;
     }
 
     public Bullet getBullet(long id){
-        return idBullets.get(id);
+        return this.idBullets.get(id);
     }
 
+    public Set<Bullet> getBullets(){
+        return bullets.keySet();
+    }
 
+    public Player getPlayer(Bullet bullet){
+        return bullets.get(bullet);
+    }
+
+    public void stopGameFor(Player player){
+        players.remove(player);
+    }
 }

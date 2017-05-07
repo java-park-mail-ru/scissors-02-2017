@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -37,4 +38,19 @@ public class RemotePointService {
     public boolean isConnected(@NotNull String user) {
         return sessions.containsKey(user) && sessions.get(user).isOpen();
     }
+
+    public void disconnect(String player) {
+        final WebSocketSession webSocketSession = sessions.get(player);
+        if (webSocketSession != null && webSocketSession.isOpen()) {
+            try {
+                webSocketSession.close(CloseStatus.SERVER_ERROR);
+            } catch (IOException ignore) {
+            }
+        }
+    }
+
+    public void removeUser(String user) {
+        sessions.remove(user);
+    }
+
 }

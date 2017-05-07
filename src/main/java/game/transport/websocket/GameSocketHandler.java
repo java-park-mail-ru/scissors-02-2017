@@ -1,6 +1,7 @@
 package game.transport.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import game.services.RemotePointService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +12,21 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+
 @Component
 public class GameSocketHandler extends TextWebSocketHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSocketHandler.class);
     private static final String KEY = "login";
     private @NotNull GameMessageHandlerContainer gameMessageHandlerContainer;
+    private @NotNull RemotePointService remotePointService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public GameSocketHandler(@NotNull GameMessageHandlerContainer gameMessageHandlerContainer) {
+    public GameSocketHandler(@NotNull GameMessageHandlerContainer gameMessageHandlerContainer,
+                             @NotNull RemotePointService remotePointService) {
         this.gameMessageHandlerContainer = gameMessageHandlerContainer;
+        this.remotePointService = remotePointService;
     }
 
     @Override
@@ -65,6 +70,12 @@ public class GameSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
+        //final String user = (String) webSocketSession.getAttributes().get(KEY);
+        final String user = "test";
+        if (user == null) {
+            return;
+        }
+        remotePointService.removeUser(user);
         LOGGER.info("connection close");
     }
 

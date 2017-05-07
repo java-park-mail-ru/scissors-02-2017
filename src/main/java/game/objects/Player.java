@@ -1,14 +1,10 @@
 package game.objects;
 
 
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Player extends GameObject {
-    private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(Player.class);
     private String user;
-    private int score;
+    private long score;
     private int health;
     private boolean isFiring;
 
@@ -19,7 +15,7 @@ public class Player extends GameObject {
         this.user = user;
     }
 
-    public void setScore(int score) {
+    public void setScore(long score) {
         this.score = score;
     }
 
@@ -31,7 +27,7 @@ public class Player extends GameObject {
         return user;
     }
 
-    public int getScore() {
+    public long getScore() {
         return score;
     }
 

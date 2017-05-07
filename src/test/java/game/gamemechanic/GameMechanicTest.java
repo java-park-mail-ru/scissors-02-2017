@@ -96,8 +96,7 @@ public class GameMechanicTest {
         snap1.setX(100);
         snap1.setY(100);
         snap1.setDirection(0);
-        snap1.setFiring(false);
-        snap1.setBullets(new ArrayList<>());
+        snap1.setIsFiring(false);
         return snap1;
     }
 
@@ -107,9 +106,8 @@ public class GameMechanicTest {
         snap1.setX(100);
         snap1.setY(100);
         snap1.setDirection(0);
-        snap1.setFiring(true);
+        snap1.setIsFiring(true);
         snap1.setWeapon("pistol");
-        snap1.setBullets(new ArrayList<>());
         return snap1;
     }
 }
