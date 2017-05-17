@@ -1,14 +1,33 @@
 package game.objects;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Player extends GameObject {
     private String user;
     private long score;
     private int health;
     private boolean isFiring;
+    private short speed;
+    @JsonIgnore
+    private List<Coords> desirableShift = new ArrayList<>();
 
     public Player() {
+    }
+
+    public List<Coords> getDesirableShift() {
+        return desirableShift;
+    }
+
+    public void addDesirableShift(int dx, int dy) {
+        this.desirableShift.add(new Coords(dx, dy));
+    }
+
+    public void clearShifts() {
+        this.desirableShift.clear();
     }
 
     public void setUser(String user) {
@@ -43,6 +62,14 @@ public class Player extends GameObject {
         isFiring = firing;
     }
 
+    public short getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(short speed) {
+        this.speed = speed;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -59,7 +86,7 @@ public class Player extends GameObject {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return user.hashCode();
     }
 }

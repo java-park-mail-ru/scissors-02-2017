@@ -27,8 +27,8 @@ public class GameMechanic {
     private @NotNull GameService gameService;
     private @NotNull ResourseFactory resourseFactory;
 
-    private  int NUMBER_PLAYERS;
-    private  long GAME_TIME;
+    private int NUMBER_PLAYERS;
+    private long GAME_TIME;
 
     private @NotNull Set<Player> players = new HashSet<>();
 
@@ -45,11 +45,12 @@ public class GameMechanic {
         this.gameService = gameService;
         this.resourseFactory = resourseFactory;
     }
+
     @PostConstruct
-    private void setup(){
-        final Deathmatch setting = resourseFactory.get("game/deathmatch.json", Deathmatch.class);
-        NUMBER_PLAYERS = setting.getPlayers();
-        GAME_TIME = setting.getGameTime();
+    private void setup() {
+        final Deathmatch settings = resourseFactory.get("game/deathmatch.json", Deathmatch.class);
+        NUMBER_PLAYERS = settings.getPlayers();
+        GAME_TIME = settings.getGameTime();
     }
 
     public void addSnap(String user, ClientSnap clientSnap) {
@@ -82,7 +83,7 @@ public class GameMechanic {
 
         tryStartGames();
 
-        gameService.processSnapshots();
+        gameService.processGame();
 
         gameService.createAndSendMessages();
 

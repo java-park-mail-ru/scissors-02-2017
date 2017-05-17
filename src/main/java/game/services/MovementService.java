@@ -28,9 +28,9 @@ public class MovementService {
     public void move() {
         for (GameObject gameObject : objectsToMove) {
             if (Objects.equals(gameObject.getClass().getName(), "game.objects.Player")) {
-                gameObject.setPresentPosition(gameObject.getDesirablePosition());
+                //gameObject.setPresentPosition(gameObject.getDesirablePosition());
             } else if (Objects.equals(gameObject.getClass().getName(), "game.objects.bullets.Bullet")) {
-                gameObject.setPresentPosition(gameObject.getDesirablePosition());
+                //gameObject.setPresentPosition(gameObject.getDesirablePosition());
             }
         }
 

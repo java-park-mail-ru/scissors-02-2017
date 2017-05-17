@@ -22,11 +22,11 @@ public class Bullet extends GameObject {
         return id;
     }
 
-    public int getSpeed() {
+    public short getSpeed() {
         return speed;
     }
 
-    public int getDamage() {
+    public short getDamage() {
         return damage;
     }
 
@@ -40,5 +40,9 @@ public class Bullet extends GameObject {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

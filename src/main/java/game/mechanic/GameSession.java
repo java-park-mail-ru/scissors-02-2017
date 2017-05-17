@@ -18,8 +18,8 @@ public class GameSession {
         players.addAll(users);
     }
 
-    public void addBullet(Player player,Bullet bul){
-        this.idBullets.putIfAbsent(bul.getId(),bul);
+    public void addBullet(Player player, Bullet bul) {
+        this.idBullets.putIfAbsent(bul.getId(), bul);
         this.bullets.putIfAbsent(bul, player);
     }
 
@@ -31,19 +31,19 @@ public class GameSession {
         return System.currentTimeMillis() - time > gameTime;
     }
 
-    public Bullet getBullet(long id){
+    public Bullet getBullet(long id) {
         return this.idBullets.get(id);
     }
 
-    public Set<Bullet> getBullets(){
+    public Set<Bullet> getBullets() {
         return bullets.keySet();
     }
 
-    public Player getPlayer(Bullet bullet){
+    public Player getPlayer(Bullet bullet) {
         return bullets.get(bullet);
     }
 
-    public void stopGameFor(Player player){
+    public void stopGameFor(Player player) {
         players.remove(player);
     }
 }

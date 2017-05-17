@@ -93,8 +93,6 @@ public class GameMechanicTest {
     private ClientSnap createMoveSnap(){
         final ClientSnap snap1 = new ClientSnap();
         snap1.setUser("player1");
-        snap1.setX(100);
-        snap1.setY(100);
         snap1.setDirection(0);
         snap1.setIsFiring(false);
         return snap1;
@@ -103,8 +101,6 @@ public class GameMechanicTest {
     private ClientSnap createFiringSnap(){
         final ClientSnap snap1 = new ClientSnap();
         snap1.setUser("player1");
-        snap1.setX(100);
-        snap1.setY(100);
         snap1.setDirection(0);
         snap1.setIsFiring(true);
         snap1.setWeapon("pistol");

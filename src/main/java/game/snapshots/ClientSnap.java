@@ -1,41 +1,21 @@
 package game.snapshots;
 
 
-import game.objects.Bullet;
-
-import java.util.ArrayList;
-import java.util.List;
+import game.objects.Way;
 
 public class ClientSnap {
     private String user;
-    private int x;
-    private int y;
+    private Way way;
     private double direction;
     private boolean isFiring;
     private String weapon;
     private long frameTime;
-    private List<Bullet> bullets=new ArrayList<>();
 
-    public ClientSnap(){}
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
+    public ClientSnap() {
     }
 
     public void setUser(String user) {
         this.user = user;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
     }
 
     public String getUser() {
@@ -74,11 +54,11 @@ public class ClientSnap {
         return frameTime;
     }
 
-    public List<Bullet> getBullets() {
-        return bullets;
+    public void setWay(Way way) {
+        this.way = way;
     }
 
-    public void setBullets(List<Bullet> bullets) {
-        this.bullets = bullets;
+    public Way getWay() {
+        return way;
     }
 }

@@ -2,8 +2,9 @@ package game.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import game.mechanic.Resourse;
 import game.objects.Bullet;
-import game.resourses.ResourseFactory;
+import game.objects.Way;
 import game.snapshots.ClientSnap;
 import game.objects.Coords;
 import game.mechanic.GameSession;
@@ -30,7 +31,7 @@ public class GameService {
 
     private @NotNull MovementService movementService;
 
-    private @NotNull ResourseFactory resourseFactory;
+    private @NotNull Resourse resourses;
 
     private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(GameService.class);
 
@@ -39,12 +40,12 @@ public class GameService {
                        @NotNull ServerSnapshotService serverSnapshotService,
                        @NotNull ClientSnapshotService clientSnapshotService,
                        @NotNull MovementService movementService,
-                       @NotNull ResourseFactory resourseFactory) {
+                       @NotNull Resourse resourses) {
         this.remotePointService = remotePointService;
         this.serverSnapshotService = serverSnapshotService;
         this.clientSnapshotService = clientSnapshotService;
         this.movementService = movementService;
-        this.resourseFactory = resourseFactory;
+        this.resourses = resourses;
     }
 
     public void startGame(List<Player> players) {
@@ -83,41 +84,29 @@ public class GameService {
         }
     }
 
-    public void processSnapshots() {
+    public void processGame() {
         for (GameSession gameSession : gameSessions) {
-            processSnapshotsForSession(gameSession);
+            processGameForSession(gameSession);
         }
         clientSnapshotService.clear();
     }
 
-    public void processSnapshotsForSession(GameSession forGameSession) {
+    private void processGameForSession(GameSession forGameSession) {
         final Set<Player> players = forGameSession.getPlayers();
         for (Player player : players) {
             final List<ClientSnap> snaps = clientSnapshotService.getClientSnaps(player.getUser());
             if (snaps != null) {
                 for (ClientSnap snap : snaps) {
                     player.setDirection(snap.getDirection());
-                    player.setDesirablePosition(new Coords(snap.getX(), snap.getY()));
-                    movementService.addObject(player);
+                    movement(snap.getWay(), player);
 
                     if (snap.isFiring()) {
                         LOGGER.info("isFiring");
                         final String type = snap.getWeapon();
-                        final String descriptor = "game/weapon/" + type + ".json";
-                        final Bullet bullet = resourseFactory.get(descriptor, Bullet.class);
+                        final Bullet bullet = (Bullet) resourses.getObject(type);
                         if (bullet != null) {
+                            bullet.setPresentPosition(player.getPresentPosition());
                             forGameSession.addBullet(player, bullet);
-                            //начальные координаты снаряда:положение игрока
-                        }
-
-                    }
-
-                    final List<Bullet> snapBullets = snap.getBullets();
-                    if (!snapBullets.isEmpty()) {
-                        for (Bullet snapBullet : snapBullets) {
-                            final Bullet bullet = forGameSession.getBullet(snapBullet.getId());
-                            bullet.setDesirablePosition(snapBullet.getPresentPosition());
-                            movementService.addObject(bullet);
                         }
                     }
                 }
@@ -125,6 +114,29 @@ public class GameService {
         }
         movementService.move();
         movementService.clear();
+    }
+
+    private void movement(Way way, Player player) {
+        int dx = 0;
+        int dy = 0;
+        switch (way) {
+            case RIGHT:
+                dy = player.getSpeed();
+                break;
+            case LEFT:
+                dy = -player.getSpeed();
+                break;
+            case UP:
+                dx = -player.getSpeed();
+                break;
+            case DOUW:
+                dx = player.getSpeed();
+                break;
+            case NONE:
+                return;
+        }
+        player.addDesirableShift(dx, dy);
+        movementService.addObject(player);
     }
 
     public void stopGameSessions(long gameTime) {

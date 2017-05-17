@@ -26,8 +26,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(gameWebSocketHandler(), "/game")
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
-                .setAllowedOrigins("*");
+                .setAllowedOrigins("http:\\localhost:8082");
     }
+
     public static final long IDLE_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(1);
     public static final int BUFFER_SIZE_BYTES = 8192;
 
