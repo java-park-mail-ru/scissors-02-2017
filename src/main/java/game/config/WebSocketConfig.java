@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(gameWebSocketHandler(), "/game")
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
-                .setAllowedOrigins("http:\\localhost:8082");
+                .setAllowedOrigins("http://localhost:8090");
     }
 
     public static final long IDLE_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(1);

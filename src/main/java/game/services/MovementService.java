@@ -2,12 +2,13 @@ package game.services;
 
 
 import game.mechanic.GameSession;
-import game.objects.GameObject;
+import game.objects.Bullet;
+import game.objects.Coords;
+import game.objects.Player;
 import org.springframework.stereotype.Service;
 
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -15,27 +16,40 @@ public class MovementService {
 
     private GameSession gameSession;
 
-    private Set<GameObject> objectsToMove = new HashSet<>();
+    private Set<Player> players = new HashSet<>();
 
-    public void setGameSession(GameSession gameSession){
+    public void setGameSession(GameSession gameSession) {
         this.gameSession = gameSession;
     }
 
-    public void addObject(GameObject gameObject) {
-        objectsToMove.add(gameObject);
+    public void addObject(Player player) {
+        players.add(player);
     }
 
     public void move() {
-        for (GameObject gameObject : objectsToMove) {
-            if (Objects.equals(gameObject.getClass().getName(), "game.objects.Player")) {
-                //gameObject.setPresentPosition(gameObject.getDesirablePosition());
-            } else if (Objects.equals(gameObject.getClass().getName(), "game.objects.bullets.Bullet")) {
-                //gameObject.setPresentPosition(gameObject.getDesirablePosition());
+        for (Player player : players) {
+            int x = player.getPresentPosition().getX();
+            int y = player.getPresentPosition().getY();
+            for (Coords shift : player.getDesirableShift()) {
+                x = x + shift.getX();
+                y = y + shift.getY();
             }
+            player.setPresentPosition(new Coords(x, y));
         }
 
+        final Set<Bullet> bullets = gameSession.getBullets();
+        for (Bullet bullet : bullets) {
+            final double angle = bullet.getDirection();
+            final int x = bullet.getPresentPosition().getX() + (int) (bullet.getSpeed() * Math.cos(angle));
+            final int y = bullet.getPresentPosition().getY() + (int) (bullet.getSpeed() * Math.sin(angle));
+
+            bullet.setPresentPosition(new Coords(x, y));
+
+        }
     }
+
     public void clear() {
-        objectsToMove.clear();
+        gameSession = null;
+        players.clear();
     }
 }

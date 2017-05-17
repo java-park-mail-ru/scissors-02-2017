@@ -32,6 +32,7 @@ public class GameService {
     private @NotNull MovementService movementService;
 
     private @NotNull Resourse resourses;
+    private long GAME_TIME;
 
     private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(GameService.class);
 
@@ -46,6 +47,10 @@ public class GameService {
         this.clientSnapshotService = clientSnapshotService;
         this.movementService = movementService;
         this.resourses = resourses;
+    }
+
+    public void setGameTime(long time) {
+        this.GAME_TIME = time;
     }
 
     public void startGame(List<Player> players) {
@@ -68,30 +73,26 @@ public class GameService {
         }
     }
 
-    public void createAndSendMessages() {
-        for (GameSession gameSession : gameSessions) {
-            final Message message = serverSnapshotService.createSnapshot(gameSession);
-            LOGGER.info("Message type: " + message.getType() + " content: " + message.getContent());
-            final Set<Player> players = gameSession.getPlayers();
-            for (Player player : players) {
-                try {
-                    remotePointService.sendMessage(message, player.getUser());
-                } catch (RuntimeException ex) {
-                    remotePointService.disconnect(player.getUser());
-                    gameSession.stopGameFor(player);
-                }
+    public void createAndSendMessages(GameSession gameSession) {
+        final Message message = serverSnapshotService.createSnapshot(gameSession);
+        LOGGER.info("Message type: " + message.getType() + " content: " + message.getContent());
+        final Set<Player> players = gameSession.getPlayers();
+        for (Player player : players) {
+            try {
+                remotePointService.sendMessage(message, player.getUser());
+            } catch (RuntimeException ex) {
+                remotePointService.disconnect(player.getUser());
+                gameSession.stopGameFor(player);
             }
         }
+
     }
 
-    public void processGame() {
-        for (GameSession gameSession : gameSessions) {
-            processGameForSession(gameSession);
+    public void processGameForSession(GameSession forGameSession) {
+        if (forGameSession.isGameOver(GAME_TIME)) {
+            stopGameSession(forGameSession);
+            return;
         }
-        clientSnapshotService.clear();
-    }
-
-    private void processGameForSession(GameSession forGameSession) {
         final Set<Player> players = forGameSession.getPlayers();
         for (Player player : players) {
             final List<ClientSnap> snaps = clientSnapshotService.getClientSnaps(player.getUser());
@@ -112,8 +113,11 @@ public class GameService {
                 }
             }
         }
+        movementService.setGameSession(forGameSession);
         movementService.move();
         movementService.clear();
+
+        createAndSendMessages(forGameSession);
     }
 
     private void movement(Way way, Player player) {
@@ -139,18 +143,14 @@ public class GameService {
         movementService.addObject(player);
     }
 
-    public void stopGameSessions(long gameTime) {
-        for (GameSession gameSession : gameSessions) {
-            if (gameSession.isGameOver(gameTime)) {
-                LOGGER.info("game {} is over", gameSession);
-                final Message message = serverSnapshotService.gameIsOver(gameSession);
-                final Set<Player> players = gameSession.getPlayers();
-                for (Player player : players) {
-                    remotePointService.sendMessage(message, player.getUser());
-                }
-                gameSessions.remove(gameSession);
-            }
+    public void stopGameSession(GameSession gameSession) {
+        LOGGER.info("game {} is over", gameSession);
+        final Message message = serverSnapshotService.gameIsOver(gameSession);
+        final Set<Player> players = gameSession.getPlayers();
+        for (Player player : players) {
+            remotePointService.sendMessage(message, player.getUser());
         }
+        gameSessions.remove(gameSession);
     }
 
     public Set<GameSession> getGameSessions() {

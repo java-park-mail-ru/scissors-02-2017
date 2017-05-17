@@ -16,7 +16,8 @@ public class ResourseFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourseFactory.class);
 
-    public ResourseFactory(){}
+    public ResourseFactory() {
+    }
 
     public <T> T get(String path, Class<T> clazz) {
         URL resourceDescriptor;
