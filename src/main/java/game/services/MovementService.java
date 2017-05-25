@@ -26,7 +26,7 @@ public class MovementService {
         players.add(player);
     }
 
-    public void move() {
+    public void move(int serverTime) {
         for (Player player : players) {
             int x = player.getPresentPosition().getX();
             int y = player.getPresentPosition().getY();
@@ -40,8 +40,8 @@ public class MovementService {
         final Set<Bullet> bullets = gameSession.getBullets();
         for (Bullet bullet : bullets) {
             final double angle = bullet.getDirection();
-            final int x = bullet.getPresentPosition().getX() + (int) (bullet.getSpeed() * Math.cos(angle));
-            final int y = bullet.getPresentPosition().getY() + (int) (bullet.getSpeed() * Math.sin(angle));
+            final int x = bullet.getPresentPosition().getX() + (int) (bullet.getSpeed() * Math.cos(angle))*serverTime;
+            final int y = bullet.getPresentPosition().getY() + (int) (bullet.getSpeed() * Math.sin(angle))*serverTime;
 
             bullet.setPresentPosition(new Coords(x, y));
 

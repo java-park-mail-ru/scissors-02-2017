@@ -76,7 +76,7 @@ public class GameMechanicTest {
         gameMechanic.addPlayer(player1);
         gameMechanic.addPlayer(player2);
         when(remotePointService.isConnected(anyString())).thenReturn(true);
-        gameMechanic.gameStep();
+        gameMechanic.gameStep(1);
 
         final Set<GameSession> sessions = gameService.getGameSessions();
         assertFalse("сессия не добавлена", sessions.isEmpty());
@@ -87,7 +87,7 @@ public class GameMechanicTest {
         startGame();
 
         gameMechanic.addSnap("player1", createMoveSnap());
-        gameMechanic.gameStep();
+        gameMechanic.gameStep(1);
 
         final Set<GameSession> sessions = gameService.getGameSessions();
         final Iterator<GameSession> iterator = sessions.iterator();
@@ -96,8 +96,8 @@ public class GameMechanicTest {
         final Set<Player> players = gameSession.getPlayers();
         for (Player player : players) {
             if (player.equals(player1)) {
-                assertEquals(100, player.getPresentPosition().getX());
-                assertEquals(93, player.getPresentPosition().getY());
+                assertEquals(300, player.getPresentPosition().getX());
+                assertEquals(293, player.getPresentPosition().getY());
 
             }
         }
@@ -109,6 +109,7 @@ public class GameMechanicTest {
         snap1.setWay(Way.LEFT);
         snap1.setDirection(0);
         snap1.setIsFiring(false);
+        snap1.setFrameTime(1);
         return snap1;
     }
 

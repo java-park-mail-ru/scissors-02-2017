@@ -9,7 +9,7 @@ public class ClientSnap {
     private double direction;
     private boolean isFiring;
     private String weapon;
-    private long frameTime;
+    private int frameTime;
 
     public ClientSnap() {
     }
@@ -46,11 +46,11 @@ public class ClientSnap {
         return weapon;
     }
 
-    public void setFrameTime(long frameTime) {
+    public void setFrameTime(int frameTime) {
         this.frameTime = frameTime;
     }
 
-    public long getFrameTime() {
+    public int getFrameTime() {
         return frameTime;
     }
 

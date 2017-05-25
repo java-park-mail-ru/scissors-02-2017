@@ -2,6 +2,7 @@ package game.transport.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import game.services.RemotePointService;
+import game.users.UserInfo;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,16 @@ public class GameSocketHandler extends TextWebSocketHandler {
         handleMessage(user, message);
     }*/
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        final String user = "test";
-        handleMessage(user, message, session);
+        final Message mes;
+        try {
+            mes = objectMapper.readValue(message.getPayload(), Message.class);
+            final UserInfo userInfo = objectMapper.readValue(mes.getContent(), UserInfo.class);
+            final String user = userInfo.getLogin();
+            handleMessage(user, message, session);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void handleMessage(String user, TextMessage text, WebSocketSession session) {

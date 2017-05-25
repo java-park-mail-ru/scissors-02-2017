@@ -2,6 +2,7 @@ package game.objects;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import game.resourses.ResourseBullet;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,4 +46,5 @@ public class Bullet extends GameObject {
     public String getType() {
         return type;
     }
+
 }

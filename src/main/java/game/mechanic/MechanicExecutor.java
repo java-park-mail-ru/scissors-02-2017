@@ -7,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.Clock;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 @Service
-public class MechanicExecutor implements Runnable{
-    private static final long STEP_TIME = 10000;
+public class MechanicExecutor implements Runnable {
+    private static final int STEP_TIME = 10000;
 
     private final @NotNull GameMechanic gameMechanic;
 
@@ -23,6 +24,8 @@ public class MechanicExecutor implements Runnable{
         this.gameMechanic = gameMechanic;
     }
 
+    private @NotNull Clock clock = Clock.systemDefaultZone();
+
     @PostConstruct
     public void initAfterStartup() {
         tickExecutor.execute(this);
@@ -30,8 +33,10 @@ public class MechanicExecutor implements Runnable{
 
     @Override
     public void run() {
-        while(true){
-            gameMechanic.gameStep();
+        int lastFrameMillis = STEP_TIME;
+        while (true) {
+            final int before = (int) clock.millis();
+            gameMechanic.gameStep(lastFrameMillis);
             try {
                 Thread.sleep(STEP_TIME);
             } catch (InterruptedException e) {
@@ -41,6 +46,8 @@ public class MechanicExecutor implements Runnable{
                 return;
             }
 
+            final int afterSleep = (int) clock.millis();
+            lastFrameMillis = afterSleep - before;
         }
 
     }

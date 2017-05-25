@@ -2,11 +2,11 @@ package game.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import game.mechanic.Resourse;
 import game.objects.Bullet;
-import game.objects.Way;
-import game.snapshots.ClientSnap;
 import game.objects.Coords;
+import game.objects.Way;
+import game.resourses.ResourseFactory;
+import game.snapshots.ClientSnap;
 import game.mechanic.GameSession;
 import game.objects.Player;
 import game.transport.websocket.Message;
@@ -31,7 +31,8 @@ public class GameService {
 
     private @NotNull MovementService movementService;
 
-    private @NotNull Resourse resourses;
+    private @NotNull ResourseFactory resourseFactory;
+
     private long GAME_TIME;
 
     private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(GameService.class);
@@ -41,12 +42,12 @@ public class GameService {
                        @NotNull ServerSnapshotService serverSnapshotService,
                        @NotNull ClientSnapshotService clientSnapshotService,
                        @NotNull MovementService movementService,
-                       @NotNull Resourse resourses) {
+                       @NotNull ResourseFactory resourseFactory) {
         this.remotePointService = remotePointService;
         this.serverSnapshotService = serverSnapshotService;
         this.clientSnapshotService = clientSnapshotService;
         this.movementService = movementService;
-        this.resourses = resourses;
+        this.resourseFactory = resourseFactory;
     }
 
     public void setGameTime(long time) {
@@ -56,6 +57,14 @@ public class GameService {
     public void startGame(List<Player> players) {
         final GameSession gameSession = new GameSession();
         //TODO:начальные позиции игроков
+        int i = 0;
+        final List<Coords> initPos=new ArrayList<>();
+        initPos.add(new Coords(300,300));
+        initPos.add(new Coords(500,300));
+        for (Player player : players) {
+            player.setPresentPosition(initPos.get(i));
+            i=+1;
+        }
         gameSession.addPlayers(players);
         gameSessions.add(gameSession);
 
@@ -88,7 +97,7 @@ public class GameService {
 
     }
 
-    public void processGameForSession(GameSession forGameSession) {
+    public void processGameForSession(GameSession forGameSession, int serverTime) {
         if (forGameSession.isGameOver(GAME_TIME)) {
             stopGameSession(forGameSession);
             return;
@@ -99,12 +108,12 @@ public class GameService {
             if (snaps != null) {
                 for (ClientSnap snap : snaps) {
                     player.setDirection(snap.getDirection());
-                    movement(snap.getWay(), player);
+                    movement(snap.getWay(), player, snap.getFrameTime());
 
                     if (snap.isFiring()) {
                         LOGGER.info("isFiring");
                         final String type = snap.getWeapon();
-                        final Bullet bullet = (Bullet) resourses.getObject(type);
+                        final Bullet bullet = resourseFactory.get(type, Bullet.class);
                         if (bullet != null) {
                             bullet.setPresentPosition(player.getPresentPosition());
                             forGameSession.addBullet(player, bullet);
@@ -114,27 +123,27 @@ public class GameService {
             }
         }
         movementService.setGameSession(forGameSession);
-        movementService.move();
+        movementService.move(serverTime);
         movementService.clear();
 
         createAndSendMessages(forGameSession);
     }
 
-    private void movement(Way way, Player player) {
+    private void movement(Way way, Player player, int frameTime) {
         int dx = 0;
         int dy = 0;
         switch (way) {
             case RIGHT:
-                dy = player.getSpeed();
+                dy = frameTime * player.getSpeed();
                 break;
             case LEFT:
-                dy = -player.getSpeed();
+                dy = -frameTime * player.getSpeed();
                 break;
             case UP:
-                dx = -player.getSpeed();
+                dx = -frameTime * player.getSpeed();
                 break;
             case DOUW:
-                dx = player.getSpeed();
+                dx = frameTime * player.getSpeed();
                 break;
             case NONE:
                 return;

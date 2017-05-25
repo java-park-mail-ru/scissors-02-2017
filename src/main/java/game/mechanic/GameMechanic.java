@@ -47,7 +47,7 @@ public class GameMechanic {
 
     @PostConstruct
     private void setup() {
-        final Deathmatch settings = resourseFactory.get("game/deathmatch.json", Deathmatch.class);
+        final Deathmatch settings = resourseFactory.getFromFile("game/deathmatch.json", Deathmatch.class);
         NUMBER_PLAYERS = settings.getPlayers();
         gameService.setGameTime(settings.getGameTime());
     }
@@ -77,14 +77,14 @@ public class GameMechanic {
         }
     }
 
-    public void gameStep() {
+    public void gameStep(int serverTime) {
         runTasks();
 
         tryStartGames();
 
         final Set<GameSession> sessions = gameService.getGameSessions();
         for (GameSession session : sessions) {
-            gameService.processGameForSession(session);
+            gameService.processGameForSession(session, serverTime);
         }
     }
 
