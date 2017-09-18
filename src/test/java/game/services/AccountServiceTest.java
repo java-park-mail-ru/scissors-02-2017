@@ -1,9 +1,8 @@
 package game.services;
 
 
-import game.models.UserInfo;
-import game.models.UserProfile;
-import org.junit.Before;
+import game.users.UserInfo;
+import game.users.UserProfile;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 @RunWith(SpringRunner.class)
 @Transactional
 public class AccountServiceTest {

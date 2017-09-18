@@ -2,8 +2,8 @@ package game.controllers;
 
 
 import game.response.ResponseError;
-import game.models.UserInfo;
-import game.models.UserProfile;
+import game.users.UserInfo;
+import game.users.UserProfile;
 import game.services.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 
-@CrossOrigin
+@CrossOrigin(maxAge = 84600)
 @RestController
-public class UserController {
+public class  UserController {
 
     private final AccountService accountService;
     private static final String KEY = "login";

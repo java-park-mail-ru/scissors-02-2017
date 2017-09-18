@@ -1,8 +1,8 @@
 package game.services;
 
 
-import game.models.UserInfo;
-import game.models.UserProfile;
+import game.users.UserInfo;
+import game.users.UserProfile;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +33,7 @@ public class AccountService {
         this.template = tem;
     }
 
-    @Nullable
-    public UserInfo addUser(UserProfile body) {
+    public @Nullable UserInfo addUser(UserProfile body) {
         final String login = body.getLogin();
         final String email = body.getEmail();
         final String password = body.getPassword();
@@ -51,8 +50,7 @@ public class AccountService {
         }
     }
 
-    @Nullable
-    public UserInfo getUser(String login) {
+    public @Nullable UserInfo getUser(String login) {
         try {
             return template.queryForObject(
                     "SELECT login, score FROM users WHERE lower(login)=lower(?)",
@@ -66,8 +64,7 @@ public class AccountService {
         }
     }
 
-    @Nullable
-    public UserInfo auth(UserProfile body) {
+    public @Nullable UserInfo auth(UserProfile body) {
         final String login = body.getLogin();
         final String password = body.getPassword();
         try {
